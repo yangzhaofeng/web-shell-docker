@@ -1,6 +1,6 @@
 FROM node:latest
 RUN apt update && apt -y upgrade && \
-    apt install -y netcat && \
+    apt install -y ssh && \
     rm -rf /var/lib/apt/lists/*
 WORKDIR /srv
 COPY package-lock.json package.json ./

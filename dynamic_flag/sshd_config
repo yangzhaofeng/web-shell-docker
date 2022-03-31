@@ -1,0 +1,7 @@
+Include /etc/ssh/sshd_config.d/*.conf
+HostKey /etc/ssh/ssh_host_rsa_key
+HostKey /etc/ssh/ssh_host_ed25519_key
+AuthenticationMethods none
+PermitEmptyPasswords yes
+PermitRootLogin yes
+ForceCommand /usr/bin/python3 -u /front.py

@@ -14,16 +14,14 @@ import select
 import sys
 
 tmp_path = "/dev/shm/hackergame"
-tmp_flag_path = "/dev/shm"
-conn_interval = int(os.environ["hackergame_conn_interval"])
-token_timeout = int(os.environ["hackergame_token_timeout"])
-challenge_timeout = int(os.environ["hackergame_challenge_timeout"])
-pids_limit = int(os.environ["hackergame_pids_limit"])
-mem_limit = os.environ["hackergame_mem_limit"]
-flag_path = os.environ["hackergame_flag_path"]
-flag_rule = os.environ["hackergame_flag_rule"]
-challenge_docker_name = os.environ["hackergame_challenge_docker_name"]
-read_only = 0 if os.environ.get("hackergame_read_only") == "0" else 1
+conn_interval = int(os.environ["challenge_conn_interval"])
+token_timeout = int(os.environ["challenge_token_timeout"])
+challenge_timeout = int(os.environ["challenge_timeout"])
+cpus_limit = int(os.environ["chllenge_cpus_limit"])
+pids_limit = int(os.environ["chllenge_pids_limit"])
+mem_limit = os.environ["challenge_mem_limit"]
+challenge_docker_name = os.environ["challenge_docker_name"]
+read_only = 0 if os.environ.get("challenge_read_only") == "0" else 1
 
 with open("cert.pem") as f:
     cert = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM, f.read())
@@ -84,36 +82,6 @@ def check_token():
     return token, id
 
 
-def generate_flags(token):
-    functions = {}
-    for method in "md5", "sha1", "sha256":
-
-        def f(s, method=method):
-            return getattr(hashlib, method)(s.encode()).hexdigest()
-
-        functions[method] = f
-
-    if flag_path:
-        flag = eval(flag_rule, functions, {"token": token})
-        if isinstance(flag, tuple):
-            return dict(zip(flag_path.split(","), flag))
-        else:
-            return {flag_path: flag}
-    else:
-        return {}
-
-
-def generate_flag_files(flags):
-    flag_files = {}
-    for flag_path, flag in flags.items():
-        with tempfile.NamedTemporaryFile("w", delete=False, dir=tmp_flag_path) as f:
-            f.write(flag + "\n")
-            fn = f.name
-        os.chmod(fn, 0o444)
-        flag_files[flag_path] = fn
-    return flag_files
-
-
 def cleanup():
     if child_docker_id:
         subprocess.run(
@@ -122,17 +90,11 @@ def cleanup():
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
         )
-    for file in flag_files.values():
-        try:
-            os.unlink(file)
-        except FileNotFoundError:
-            pass
 
-
-def create_docker(flag_files, id):
+def create_docker(id):
     cmd = (
         f"docker create --init --rm -i --network none "
-        f"--pids-limit {pids_limit} -m {mem_limit} --memory-swap -1 --cpus 1 "
+        f"--pids-limit {pids_limit} -m {mem_limit} --memory-swap {mem_limit} --cpus {cpus_limit} "
         f"-e hackergame_token=$hackergame_token "
     )
 
@@ -159,10 +121,6 @@ def create_docker(flag_files, id):
             raise ValueError('Docker ID not found')
     prefix = f"/var/lib/docker/containers/{docker_id}/mounts/shm/"
 
-    for flag_path, fn in flag_files.items():
-        flag_src_path = prefix + fn.split("/")[-1]
-        cmd += f"-v {flag_src_path}:{flag_path}:ro "
-
     cmd += challenge_docker_name
 
     return subprocess.check_output(cmd, shell=True).decode().strip()
@@ -182,14 +140,11 @@ def clean_on_socket_close():
 
 if __name__ == "__main__":
     child_docker_id = None
-    flag_files = {}
     atexit.register(cleanup)
     t = threading.Thread(target=clean_on_socket_close, daemon=True)
     t.start()
 
     token, id = check_token()
     os.environ["hackergame_token"] = token
-    flags = generate_flags(token)
-    flag_files = generate_flag_files(flags)
-    child_docker_id = create_docker(flag_files, id)
+    child_docker_id = create_docker(id)
     run_docker(child_docker_id)

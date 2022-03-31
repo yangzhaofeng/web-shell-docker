@@ -8,9 +8,9 @@ app.use(express.static('static'));
 app.ws('/shell', (ws, req) => {
   var shell;
   if (Number(process.env.nc_raw)) {
-    shell = pty.spawn('/bin/bash', ['-c', 'stty raw -echo; nc ' + process.env.nc_host + ' ' + process.env.nc_port]);
+    shell = pty.spawn('/bin/bash', ['-c', 'stty raw -echo; ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -p ' + process.env.nc_port + ' root@' + process.env.nc_host]);
   } else {
-    shell = pty.spawn('/bin/nc', [process.env.nc_host, process.env.nc_port]);
+    shell = pty.spawn('/usr/bin/ssh', ["-o", "StrictHostKeyChecking=no", "-o", "UserKnownHostsFile=/dev/null", "-p", process.env.nc_port, "root@" + process.env.nc_host]);
   }
   shell.on('data', (data) => {
     ws.send(data);

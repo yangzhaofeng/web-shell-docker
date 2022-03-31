@@ -10,13 +10,11 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
-      - hackergame_conn_interval=${conn_interval}
-      - hackergame_token_timeout=${token_timeout}
-      - hackergame_challenge_timeout=${challenge_timeout}
-      - hackergame_pids_limit=${pids_limit}
-      - hackergame_mem_limit=${mem_limit}
-      - hackergame_flag_path=${flag_path}
-      - hackergame_flag_rule=${flag_rule}
-      - hackergame_challenge_docker_name=${challenge_docker_name}
-      - hackergame_read_only=${read_only}
+      - challenge_conn_interval=${conn_interval}
+      - challenge_token_timeout=${token_timeout}
+      - challenge_timeout=${challenge_timeout}
+      - challenge_pids_limit=${pids_limit}
+      - challenge_mem_limit=${mem_limit}
+      - challenge_docker_name=${challenge_docker_name}
+      - challenge_read_only=${read_only}
       - TZ=Asia/Shanghai
