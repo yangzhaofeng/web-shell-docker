@@ -10,7 +10,9 @@ RUN apt update && apt -y upgrade && \
     apt autoremove --purge -y && \
     rm -rf openssh-server_8.4p1-5+all11u1_amd64.deb openssh-sftp-server_8.4p1-5+all11u1_amd64.deb openssh-client_8.4p1-5+all11u1_amd64.deb && \
     rm -rf /var/lib/apt/lists/* && \
-    passwd -d root
+    passwd -d root && \
+    mkdir -p /run/sshd
 COPY front.py /
 COPY cert.pem /
-CMD ["/usr/sbin/sshd", "-D", "-p", "2333", "-o", "environment=port=${port} conn_interval=${conn_interval} token_timeout=${token_timeout} challenge_timeout=${challenge_timeout} pids_limit=${pids_limit} cpus_limit=${cpus_limit} mem_limit=${mem_limit} challenge_docker_name=${challenge_docker_name}"]
+COPY sshd_config /etc/ssh
+CMD ["/usr/sbin/sshd", "-D", "-p", "2333", "-o", "SetEnv=port=${port} challenge_conn_interval=${challenge_conn_interval} challenge_token_timeout=${challenge_token_timeout} challenge_timeout=${challenge_timeout} challenge_pids_limit=${challenge_pids_limit} challenge_cpus_limit=${challenge_cpus_limit} challenge_mem_limit=${challenge_mem_limit} challenge_docker_name=${challenge_docker_name}"]
