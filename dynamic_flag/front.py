@@ -127,7 +127,7 @@ def create_docker(id):
 
 
 def run_docker(child_docker_id):
-    cmd = f"timeout -s 9 {challenge_timeout} docker start -i {child_docker_id}"
+    cmd = f"timeout -s 9 --foreground {challenge_timeout} docker start -i {child_docker_id}"
     subprocess.run(cmd, shell=True)
 
 
