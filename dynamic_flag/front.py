@@ -93,7 +93,7 @@ def cleanup():
 
 def create_docker(id):
     cmd = (
-        f"docker create --init --rm -i --network none "
+        f"docker create --init --rm -it --network none "
         f"--pids-limit {pids_limit} -m {mem_limit} --memory-swap {mem_limit} --cpus {cpus_limit} "
         f"-e hackergame_token=$hackergame_token "
     )

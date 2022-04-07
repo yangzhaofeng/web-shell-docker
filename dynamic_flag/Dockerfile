@@ -15,4 +15,4 @@ RUN apt update && apt -y upgrade && \
 COPY front.py /
 COPY cert.pem /
 COPY sshd_config /etc/ssh
-CMD ["/usr/sbin/sshd", "-D", "-p", "2333", "-o", "SetEnv=port=${port} challenge_conn_interval=${challenge_conn_interval} challenge_token_timeout=${challenge_token_timeout} challenge_timeout=${challenge_timeout} challenge_pids_limit=${challenge_pids_limit} challenge_cpus_limit=${challenge_cpus_limit} challenge_mem_limit=${challenge_mem_limit} challenge_docker_name=${challenge_docker_name}"]
+CMD ["/bin/sh", "-c", "/usr/sbin/sshd -D -p 2333 -o \"SetEnv=port=${port} challenge_conn_interval=${challenge_conn_interval} challenge_token_timeout=${challenge_token_timeout} challenge_timeout=${challenge_timeout} challenge_pids_limit=${challenge_pids_limit} challenge_cpus_limit=${challenge_cpus_limit} challenge_mem_limit=${challenge_mem_limit} challenge_docker_name=${challenge_docker_name}\""]
