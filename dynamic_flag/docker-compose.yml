@@ -14,6 +14,7 @@ services:
       - challenge_token_timeout=${token_timeout}
       - challenge_timeout=${challenge_timeout}
       - challenge_pids_limit=${pids_limit}
+      - challenge_cpus_limit=${cpus_limit}
       - challenge_mem_limit=${mem_limit}
       - challenge_docker_name=${challenge_docker_name}
       - challenge_read_only=${read_only}

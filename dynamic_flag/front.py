@@ -17,8 +17,8 @@ tmp_path = "/dev/shm/hackergame"
 conn_interval = int(os.environ["challenge_conn_interval"])
 token_timeout = int(os.environ["challenge_token_timeout"])
 challenge_timeout = int(os.environ["challenge_timeout"])
-cpus_limit = int(os.environ["chllenge_cpus_limit"])
-pids_limit = int(os.environ["chllenge_pids_limit"])
+cpus_limit = os.environ["challenge_cpus_limit"]
+pids_limit = int(os.environ["challenge_pids_limit"])
 mem_limit = os.environ["challenge_mem_limit"]
 challenge_docker_name = os.environ["challenge_docker_name"]
 read_only = 0 if os.environ.get("challenge_read_only") == "0" else 1
